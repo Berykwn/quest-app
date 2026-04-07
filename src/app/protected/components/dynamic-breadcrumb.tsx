@@ -16,8 +16,8 @@ const labelMap: Record<string, string> = {
     admin: 'Admin',
     courses: 'Courses',
     users: 'Users',
-    new: 'Baru',
-    result: 'Hasil',
+    new: 'Create',
+    result: 'Result',
 }
 
 export function DynamicBreadcrumb() {
@@ -25,10 +25,8 @@ export function DynamicBreadcrumb() {
 
     const rawSegments = pathname.split('/').filter(Boolean)
 
-    // hapus protected & admin dari awal
     const segments = rawSegments.filter(s => !['protected', 'admin'].includes(s))
 
-    // selalu ada dashboard di awal
     const crumbs = [
         {
             href: '/protected/admin',
