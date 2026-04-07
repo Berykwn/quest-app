@@ -1,139 +1,135 @@
-![image](https://github.com/michaeltroya/supa-next-starter/assets/38507347/2ea40874-98de-49ec-ab6a-74c816e6ca22)
+Cara penggunaan Questions App
 
-<h1 align="center">⚡ SupaNext Starter Kit ⚡</h1>
+## 1. Admin — Membuat Course
 
-<p align="center">
- The Last Next.js and Supabase Starter You Will Ever Need
-</p>
+1. Login sebagai admin
+2. Buka menu **Courses** di sidebar
+3. Klik tombol **New Course**
+4. Isi form:
+   - **Title** — nama course (wajib)
+   - **Description** — deskripsi singkat (opsional)
+   - **Duration** — batas waktu pengerjaan dalam menit, kosongkan jika tidak ada batas waktu
+   - **Question Limit** — jumlah soal yang ditampilkan per attempt, kosongkan untuk tampilkan semua soal
+5. Klik **Save**
 
-<div align="center">
+> Course baru otomatis berstatus **Draft** dan belum bisa dikerjakan user.
 
-<img alt="GitHub License" src="https://img.shields.io/github/license/michaeltroya/supa-next-starter">
+---
 
-  <a href="https://twitter.com/intent/follow?screen_name=michaeltroya_">
-   <img alt="X (formerly Twitter) Follow" src="https://img.shields.io/twitter/follow/michaeltroya_">
-  </a>
-</div>
+## 2. Admin — Menambahkan Soal
 
-<div align="center">
-  <sub>Created by <a href="https://twitter.com/michaeltroya_">Michael Troya</a>
-</div>
+1. Buka course yang baru dibuat
+2. Di tab **Questions**, klik **Add Question**
+3. Pilih tipe soal:
+   - **Multiple Choice** — isi minimal 2 pilihan jawaban, pilih jawaban yang benar
+   - **True / False** — pilih jawaban yang benar (True atau False)
+   - **Essay** — tidak ada jawaban benar, dinilai manual
+4. Isi kolom lainnya:
+   - **Points** — bobot nilai soal
+   - **Explanation** — penjelasan yang ditampilkan ke user setelah selesai (opsional)
+5. Klik **Save Question**
+6. Ulangi untuk soal berikutnya
 
-<br/>
+### Mengatur Required vs Random Pool
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#documentation"><strong>Documentation</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-</p>
-<br/>
+Setiap soal bisa diset sebagai:
+- **Required** — selalu muncul di setiap attempt
+- **In Pool** — masuk ke pool random, dipilih acak untuk memenuhi sisa slot
 
-## Features
+Klik tombol **Set required** atau **Set random** di samping setiap soal untuk mengubahnya.
 
-- ⚡️ Next.js 16 (App Router)
-- 💚 Supabase w/ supabase-ssr - Works across the entire [Next.js](https://nextjs.org) stack (App Router, Pages Router, Client, Server, Middleware, It just works!)
-- ⚛️ React 19
-- ⛑ TypeScript
-- 📦 [pnpm](https://pnpm.io/) - Fast, disk space efficient package manager
-- 🎨 [Tailwind](https://tailwindcss.com/)
-- 🔌 [shadcn/ui](https://ui.shadcn.com/) - Beautifully designed components that you can copy and paste into your apps.
-- 🧪 Vitest + React Testing Library - Unit tests for all of your code.
-- 🎛️ [MSW](https://mswjs.io/)v2 - Intercept requests inside your tests (set up for testing only)
-- 🪝[TanStackQuery](https://tanstack.com/query/v5)v5 - The best way to fetch data on the client
-- 📏 ESLint 9 — To find and fix problems in your code
-- 💖 Prettier — Code Formatter for consistent style
-- 🐶 Husky — For running scripts before committing
-- 🚫 lint-staged — Run ESLint and Prettier against staged Git files
-- 👷 Github Actions — Run Type Checks, Tests, and Linters on Pull Requests
-- 🗂 Path Mapping — Import components or images using the `@` prefix
-- ⚪⚫ Dark mode - Toggle theme modes with [next-themes](https://github.com/pacocoursey/next-themes)
-- ✨ Next Top Loader - Render a pleasent top loader on navigation with [nextjs-toploader](https://github.com/TheSGJ/nextjs-toploader)
-- 🔋 Lots Extras - Next Bundle Analyzer, Vercel Analytics, Vercel Geist Font
+> Jika Question Limit diset ke 10 dan ada 3 soal Required, maka 7 soal sisanya dipilih acak dari pool.
 
-## Clone and run locally
+---
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+## 3. Admin — Mempublish Course
 
-2. Create a Next.js app using the Supabase Starter template npx command
+1. Pastikan course sudah memiliki minimal **1 soal**
+2. Pastikan **Question Limit** tidak melebihi jumlah soal yang ada
+3. Di halaman detail course, aktifkan toggle **Published** di pojok kanan atas
+4. Status course berubah dari **Draft** menjadi **Published**
 
-   ```bash
-   pnpm create next-app -e https://github.com/michaeltroya/supa-next-starter
-   # or
-   npx create-next-app -e https://github.com/michaeltroya/supa-next-starter
-   ```
+> Course yang masih Draft tidak bisa dikerjakan oleh user meskipun sudah di-assign.
 
-3. Use `cd` to change into the app's directory
+---
 
-   ```bash
-   cd name-of-new-app
-   ```
+## 4. Admin — Assign User ke Course
 
-4. Rename `.env.local.example` to `.env.local` and update the following:
+1. Buka course yang sudah dipublish
+2. Buka tab **Participants**
+3. Klik tombol **Assign Participant**
+4. Cari user berdasarkan nama atau email di kolom pencarian
+5. Klik nama user untuk langsung assign
+6. User yang sudah di-assign akan muncul di daftar peserta beserta tanggal enrollment
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+Untuk melepas user dari course, klik tombol **×** di samping nama user.
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+---
 
-5. You can now run the Next.js local development server:
+## 5. User — Mengerjakan Exam
 
-   ```bash
-   pnpm run dev
-   ```
+### Memulai Exam
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+1. Login sebagai user
+2. Di **Dashboard** atau menu **My Courses**, cari course yang ingin dikerjakan
+3. Klik **View** untuk membuka halaman detail course
+4. Periksa informasi exam:
+   - Jumlah soal yang akan ditampilkan
+   - Batas waktu pengerjaan
+   - Keterangan bahwa exam hanya bisa dikerjakan **1 kali**
+5. Klik **Start Exam** jika sudah siap
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+> Setelah klik Start Exam, timer langsung berjalan dan soal sudah dikunci. Pastikan koneksi internet stabil sebelum memulai.
 
-## Showcase
+### Mengerjakan Soal
 
-Websites started using this template:
+- Gunakan **navigator nomor soal** di atas untuk berpindah antar soal
+- Nomor soal berwarna **hijau** = sudah dijawab
+- Nomor soal berwarna **abu** = belum dijawab
+- Jawaban tersimpan otomatis setiap kali memilih opsi
+- Untuk soal essay, jawaban tersimpan otomatis setelah berhenti mengetik
 
-- [Add yours](https://github.com/michaeltroya/supa-next-starter/edit/main/README.md)
+### Timer
 
-# Documentation
+- Timer ditampilkan di pojok kanan atas
+- Timer berubah **merah dan berkedip** saat sisa waktu kurang dari 5 menit
+- Jika waktu habis, exam **otomatis disubmit** dengan jawaban yang sudah diisi
 
-### Requirements
+### Submit Exam
 
-- Node.js >= 18.17.0
-- pnpm 10
+1. Setelah menjawab semua soal, klik **Submit Exam**
+2. Dialog konfirmasi akan muncul — menampilkan jumlah soal yang sudah dan belum dijawab
+3. Klik **Yes, Submit** untuk mengumpulkan jawaban
 
-### Scripts
+> Exam yang sudah disubmit tidak bisa diulang atau diubah jawabannya.
 
-- `pnpm dev` — Starts the application in development mode at `http://localhost:3000`.
-- `pnpm build` — Creates an optimized production build of your application.
-- `pnpm start` — Starts the application in production mode.
-- `pnpm type-check` — Validate code using TypeScript compiler.
-- `pnpm lint` — Runs ESLint for all files in the `src` directory.
-- `pnpm format-check` — Runs Prettier and checks if any files have formatting issues.
-- `pnpm format` — Runs Prettier and formats files.
-- `pnpm test` — Runs all the vitest tests in the project.
-- `pnpm test:ci` — Runs all the vitest tests in the project, Vitest will assume it is running in a CI environment.
-- `pnpm test:ui` — Runs Vitest with the UI interface.
-- `pnpm analyze` — Builds the project and opens the bundle analyzer.
+---
 
-### Paths
+## 6. User — Melihat Hasil
 
-TypeScript is pre-configured with custom path mappings. To import components or files, use the `@` prefix.
+Setelah submit, user langsung diarahkan ke halaman hasil yang menampilkan:
 
-```tsx
-import { Button } from '@/components/ui/Button'
+- **Skor** dalam persentase
+- **Poin** yang didapat dari total poin maksimal
+- **Durasi** pengerjaan
+- **Status** Passed (≥ 70%) atau Failed (< 70%)
+- **Review jawaban** per soal:
+  - Jawaban benar ditandai hijau
+  - Jawaban salah user dicoret merah
+  - Penjelasan ditampilkan di bawah tiap soal jika tersedia
 
-// To import images or other files from the public folder
-import avatar from '@/public/avatar.png'
-```
+Untuk mengakses kembali hasil exam, buka **My Courses** → pilih course → klik **View Result**.
 
-### Switch to Yarn/npm
+---
 
-This starter uses pnpm by default, but this choice is yours. If you'd like to switch to Yarn/npm, delete the `pnpm-lock.yaml` file, install the dependencies with Yarn/npm, change the CI workflow, and Husky Git hooks to use Yarn/npm commands.
+## 7. Admin — Melihat Hasil Exam
 
-## License
+1. Buka course di menu **Courses**
+2. Buka tab **Results**
+3. Lihat daftar semua user yang sudah mengumpulkan beserta skor dan status Pass/Fail
+4. Klik tombol **›** di samping nama user untuk melihat detail jawaban per soal
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for more information.
-
-## Feedback and issues
-
-Please file feedback and issues [here](https://github.com/michaeltroya/supa-next-starter/issues).
+Ringkasan statistik ditampilkan di atas daftar:
+- Jumlah yang sudah submit
+- Jumlah yang belum submit
+- Jumlah yang passed dan failed
