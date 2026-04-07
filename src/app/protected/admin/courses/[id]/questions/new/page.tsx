@@ -170,7 +170,7 @@ export default function NewQuestionPage({ params }: { params: Promise<{ id: stri
                                 </div>
                             )}
 
-                            {/* {questionType !== 'essay' && (
+                            {/* {questionType !== 'essay' && ( */}
                                 <div className="space-y-2">
                                     <Label htmlFor="correct_answer">Correct Answer <span aria-hidden className="text-destructive">*</span></Label>
                                     <Select value={form.correct_answer}
@@ -190,7 +190,7 @@ export default function NewQuestionPage({ params }: { params: Promise<{ id: stri
                                         </SelectContent>
                                     </Select>
                                 </div>
-                            )} */}
+                            {/* )} */}
 
                             <div className="space-y-2">
                                 <Label htmlFor="explanation">

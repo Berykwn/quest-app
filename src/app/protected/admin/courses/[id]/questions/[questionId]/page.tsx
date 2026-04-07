@@ -206,7 +206,7 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
                                 </div>
                             )}
 
-                            {/* {questionType !== 'essay' && (
+                            {/* {questionType !== 'essay' && ( */}
                                 <div className="space-y-2">
                                     <Label htmlFor="correct_answer">Correct Answer <span aria-hidden className="text-destructive">*</span></Label>
                                     <Select value={form.correct_answer}
@@ -226,7 +226,7 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
                                         </SelectContent>
                                     </Select>
                                 </div>
-                            )} */}
+                            {/* )}  */}
 
                             <div className="space-y-2">
                                 <Label htmlFor="explanation">
