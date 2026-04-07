@@ -15,10 +15,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
                         <div className="flex flex-col leading-tight">
                             <span className="text- font-semibold tracking-tight">
-                                quest.
+                                questions.
                             </span>
                             <span className="text-xs text-muted-foreground">
-                                By Priamanaya Energy
+                                by Priamanaya Energy
                             </span>
                         </div>
                     </div>

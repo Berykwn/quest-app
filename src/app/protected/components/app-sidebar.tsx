@@ -68,8 +68,8 @@ export function AppSidebar({ user }: { user: User }) {
                                     />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none mt-0.5">
-                                    <span className="font-semibold">quest.</span>
-                                    <span className="text-xs text-muted-foreground">PT. Priamanaya Energy</span>
+                                    <span className="font-semibold">questions.</span>
+                                    <span className="text-xs text-muted-foreground">by Priamanaya Energy</span>
                                 </div>
                             </Link>
                         </SidebarMenuButton>
