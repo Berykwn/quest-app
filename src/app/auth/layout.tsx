@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                                 questions.
                             </span>
                             <span className="text-xs text-muted-foreground">
-                                by Priamanaya Energy
+                                by Priamanaya Energi
                             </span>
                         </div>
                     </div>
