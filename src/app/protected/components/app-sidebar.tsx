@@ -32,12 +32,12 @@ interface User {
 const adminNav = [
     { href: '/protected/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
     { href: '/protected/admin/courses', label: 'Courses', icon: BookOpen, exact: false },
-    { href: '/protected/admin/users', label: 'Users', icon: Users, exact: false },
+    { href: '/protected/admin/users-management', label: 'Users Management', icon: Users, exact: false },
 ]
 
 const userNav = [
     { href: '/protected', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-    { href: '/protected/courses', label: 'My Courses', icon: BookOpen, exact: false },
+    { href: '/protected/my-courses', label: 'My Courses', icon: BookOpen, exact: false },
 ]
 
 export function AppSidebar({ user }: { user: User }) {
