@@ -1,118 +1,196 @@
-import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/supabase/server'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { BookOpen, Clock, ChevronRight, ClipboardList } from 'lucide-react'
+import Link from 'next/link'
+import { BookOpen, Clock, ChevronRight, CheckCircle2, CircleDashed, CirclePlay, Trophy } from 'lucide-react'
+import { notFound } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
-export default async function ProtectedPage() {
+export default async function UserDashboardPage() {
   const supabase = await createClient()
+
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login')
+  if (!user) notFound()
 
-  const { data: profile } = await supabase
-    .from('users').select('role, name').eq('id', user.id).single()
-
-  if (profile?.role === 'admin') redirect('/protected/admin')
+  const { data: dbUser } = await supabase
+    .from('users')
+    .select('name')
+    .eq('id', user.id)
+    .single()
 
   const { data: enrollments } = await supabase
     .from('enrollments')
-    .select(`course_id, assigned_at, courses(id, title, description, duration_min, questions(count))`)
+    .select(`
+            course_id,
+            assigned_at,
+            courses (
+                id, title, description, duration_min, question_limit
+            )
+        `)
     .eq('user_id', user.id)
+    .order('assigned_at', { ascending: false })
 
-  const { data: attempts } = await supabase
-    .from('attempts')
-    .select('course_id, score, finished_at')
-    .eq('user_id', user.id)
-    .not('finished_at', 'is', null)
+  const courseIds = enrollments?.map(e => e.course_id) ?? []
 
-  const attemptMap = new Map(attempts?.map(a => [a.course_id, a]))
+  const { data: attempts } = courseIds.length > 0
+    ? await supabase
+      .from('attempts')
+      .select('id, course_id, score, started_at, finished_at')
+      .eq('user_id', user.id)
+      .in('course_id', courseIds)
+      .order('started_at', { ascending: false })
+    : { data: [] }
+
+  const attemptByCourse = new Map<string, any>()
+  for (const attempt of attempts ?? []) {
+    if (!attemptByCourse.has(attempt.course_id)) {
+      attemptByCourse.set(attempt.course_id, attempt)
+    }
+  }
+
+  const courses = enrollments
+    ?.filter(e => e.courses)
+    .map(e => ({
+      ...(e.courses as any),
+      assigned_at: e.assigned_at,
+      attempt: attemptByCourse.get(e.course_id) ?? null,
+    })) ?? []
+
+  const total = courses.length
+  const completed = courses.filter(c => c.attempt?.finished_at).length
+  const inProgress = courses.filter(c => c.attempt && !c.attempt.finished_at).length
+  const notStarted = total - completed - inProgress
+  const passed = courses.filter(c =>
+    c.attempt?.finished_at && (c.attempt?.score ?? 0) >= 70
+  ).length
+
+  // Prioritize in_progress, then not_started, then completed
+  const prioritized = [
+    ...courses.filter(c => c.attempt && !c.attempt.finished_at),
+    ...courses.filter(c => !c.attempt),
+    ...courses.filter(c => c.attempt?.finished_at),
+  ].slice(0, 4)
+
+  const firstName = dbUser?.name?.split(' ')[0] ?? 'there'
 
   return (
     <div className="space-y-8">
-      <section>
-        <h1 className="text-2xl font-semibold">
-          Welcome back, {profile?.name || 'there'} 👋
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Here are your assigned exams.
+      {/* Greeting */}
+      <header>
+        <h1 className="text-2xl font-semibold">Hi, {firstName} 👋</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Here's an overview of your exam progress.
         </p>
-      </section>
+      </header>
 
-      <section aria-label="Summary" className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {/* Stats */}
+      <section aria-label="Statistics" className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Assigned', value: enrollments?.length ?? 0 },
-          { label: 'Completed', value: attempts?.length ?? 0 },
-          { label: 'Remaining', value: (enrollments?.length ?? 0) - (attempts?.length ?? 0) },
-        ].map(({ label, value }) => (
-          <article key={label} className="rounded-lg border bg-card p-4 space-y-1">
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-2xl font-semibold">{value}</p>
+          { label: 'Total Courses', value: total, className: '' },
+          { label: 'In Progress', value: inProgress, className: inProgress > 0 ? 'text-amber-600' : '' },
+          { label: 'Completed', value: completed, className: completed > 0 ? 'text-emerald-600' : '' },
+          { label: 'Passed', value: `${passed} / ${completed}`, className: passed > 0 ? 'text-emerald-600' : '' },
+        ].map(({ label, value, className }) => (
+          <article key={label} className="rounded-lg border bg-card p-4 flex items-center gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">{label}</p>
+              <p className={cn('text-2xl font-semibold', className)}>{value}</p>
+            </div>
           </article>
         ))}
       </section>
 
-      <section aria-labelledby="courses-title">
-        <h2 id="courses-title" className="text-lg font-medium mb-4">My Exams</h2>
+      {/* Course list */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-medium">My Courses</h2>
+          {total > 4 && (
+            <Button asChild variant="ghost" size="sm" className="gap-1">
+              <Link href="/protected/my-courses">
+                View all <ChevronRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          )}
+        </div>
 
-        {!enrollments?.length ? (
+        {courses.length === 0 ? (
           <div className="rounded-lg border border-dashed p-12 text-center">
-            <ClipboardList className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-            <p className="text-muted-foreground text-sm">No exams assigned yet.</p>
+            <BookOpen className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+            <p className="text-muted-foreground text-sm">You have no courses assigned yet.</p>
           </div>
         ) : (
-          <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0 m-0">
-            {enrollments.map((enrollment: any) => {
-              const course = enrollment.courses
-              const attempt = attemptMap.get(course.id)
-              const isDone = !!attempt
+          <ul className="grid sm:grid-cols-2 gap-4 list-none p-0 m-0">
+            {prioritized.map(course => {
+              const isDone = !!course.attempt?.finished_at
+              const isInProgress = course.attempt && !course.attempt.finished_at
+              const score = course.attempt?.score ?? null
+              const isPassed = (score ?? 0) >= 70
+
+              const statusBadge = isDone
+                ? { label: 'Completed', icon: CheckCircle2, className: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' }
+                : isInProgress
+                  ? { label: 'In Progress', icon: CirclePlay, className: 'bg-amber-100 text-amber-700 hover:bg-amber-100' }
+                  : { label: 'Not Started', icon: CircleDashed, className: 'bg-neutral-100 text-neutral-600 hover:bg-neutral-100' }
+
+              const { label, icon: Icon, className } = statusBadge
 
               return (
                 <li key={course.id}>
                   <Card className="h-full flex flex-col hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
                       <div className="flex items-start justify-between gap-2">
-                        <CardTitle className="text-base leading-snug">{course.title}</CardTitle>
-                        <Badge variant={isDone ? 'secondary' : 'default'} className="shrink-0">
-                          {isDone ? 'Done' : 'Pending'}
-                        </Badge>
+                        <CardTitle className="text-base">{course.title}</CardTitle>
+                        <Button
+                          asChild
+                          variant="ghost"
+                          size="sm"
+                          className={cn('shrink-0 gap-1 text-xs h-auto py-1 px-2', className)}
+                        >
+                          <Link href={`/protected/my-courses/${course.id}`}>
+                            <Icon className="h-3 w-3" />
+                            {label}
+                          </Link>
+                        </Button>
                       </div>
                       {course.description && (
-                        <CardDescription className="line-clamp-2 text-sm">
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                           {course.description}
-                        </CardDescription>
+                        </p>
                       )}
                     </CardHeader>
 
-                    <CardContent className="pb-2 flex-1">
-                      <dl className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <BookOpen className="h-3.5 w-3.5" aria-hidden />
-                          <dd>{course.questions?.[0]?.count ?? 0} questions</dd>
-                        </div>
+                    <CardContent className="flex items-end justify-between gap-4 flex-1">
+                      <dl className="flex gap-4 text-sm text-muted-foreground">
+                        {course.question_limit && (
+                          <div className="flex items-center gap-1">
+                            <BookOpen className="h-3.5 w-3.5" />
+                            <dd>{course.question_limit} questions</dd>
+                          </div>
+                        )}
                         {course.duration_min && (
                           <div className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5" aria-hidden />
+                            <Clock className="h-3.5 w-3.5" />
                             <dd>{course.duration_min} min</dd>
                           </div>
                         )}
+                        {isDone && score !== null && (
+                          <div className={cn(
+                            'flex items-center gap-1 font-medium',
+                            isPassed ? 'text-emerald-600' : 'text-destructive'
+                          )}>
+                            <Trophy className="h-3.5 w-3.5" />
+                            <dd>{Math.round(score)}% · {isPassed ? 'Pass' : 'Fail'}</dd>
+                          </div>
+                        )}
                       </dl>
-                      {isDone && attempt.score !== null && (
-                        <p className="mt-2 text-sm font-medium text-green-600">
-                          Score: {attempt.score.toFixed(0)}
-                        </p>
-                      )}
-                    </CardContent>
 
-                    <CardFooter>
-                      <Button asChild className="w-full gap-2" variant={isDone ? 'outline' : 'default'}>
-                        <Link href={`/protected/course/${course.id}`}>
-                          {isDone ? 'View Results' : 'Start Exam'}
-                          <ChevronRight className="h-4 w-4" aria-hidden />
+                      <Button asChild variant="ghost" size="sm" className="gap-1 shrink-0">
+                        <Link href={`/protected/my-courses/${course.id}`}>
+                          {isDone ? 'View Result' : isInProgress ? 'Continue' : 'Start'}
+                          <ChevronRight className="h-4 w-4" />
                         </Link>
                       </Button>
-                    </CardFooter>
+                    </CardContent>
                   </Card>
                 </li>
               )
