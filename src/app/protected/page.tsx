@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { BookOpen, Clock, ChevronRight, CheckCircle2, CircleDashed, CirclePlay, Trophy } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { JoinCourseDialog } from './components/join-course-dialog'
 
 export default async function UserDashboardPage() {
   const supabase = await createClient()
@@ -77,7 +78,10 @@ export default async function UserDashboardPage() {
     <div className="space-y-8">
       {/* Greeting */}
       <header>
-        <h1 className="text-2xl font-semibold">Hi, {firstName} 👋</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">Hi, {firstName} 👋</h1>
+          <JoinCourseDialog />
+        </div>
         <p className="text-muted-foreground text-sm mt-1">
           Here's an overview of your exam progress.
         </p>
@@ -117,6 +121,7 @@ export default async function UserDashboardPage() {
           <div className="rounded-lg border border-dashed p-12 text-center">
             <BookOpen className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
             <p className="text-muted-foreground text-sm">You have no courses assigned yet.</p>
+            <p className="text-muted-foreground text-xs mt-1">Have an enroll code? Use the Join Course button above.</p>
           </div>
         ) : (
           <ul className="grid sm:grid-cols-2 gap-4 list-none p-0 m-0">

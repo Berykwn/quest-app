@@ -59,6 +59,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
                         {course.description && (
                             <p className="text-muted-foreground text-sm">{course.description}</p>
                         )}
+                        {course.enroll_code && (
+                            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
+                                <span>Enroll Code:</span>
+                                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs font-medium text-foreground">
+                                    {course.enroll_code}
+                                </code>
+                            </p>
+                        )}
                     </div>
                 </div>
                 <CourseActions course={course} />

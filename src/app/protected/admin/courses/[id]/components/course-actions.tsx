@@ -31,6 +31,7 @@ export default function CourseActions({ course }: { course: any }) {
         description: course.description ?? '',
         duration_min: course.duration_min?.toString() ?? '',
         question_limit: course.question_limit?.toString() ?? '',
+        enroll_code: course.enroll_code ?? '',
     })
 
     async function togglePublish(val: boolean) {
@@ -97,6 +98,7 @@ export default function CourseActions({ course }: { course: any }) {
             description: form.description.trim() || null,
             duration_min: form.duration_min ? parseInt(form.duration_min) : null,
             question_limit: form.question_limit ? parseInt(form.question_limit) : null,
+            enroll_code: form.enroll_code.trim() || null,
         }).eq('id', course.id)
 
         if (error) {
@@ -189,6 +191,20 @@ export default function CourseActions({ course }: { course: any }) {
                             Required questions always appear. Remaining slots filled randomly.
                             Question limit cannot exceed total questions in this course.
                         </p>
+                        <div className="space-y-2">
+                            <Label htmlFor="enroll_code">Enroll Code</Label>
+                            <Input
+                                id="enroll_code"
+                                placeholder="e.g. SAFETY2026"
+                                value={form.enroll_code}
+                                onChange={e => setForm(f => ({ ...f, enroll_code: e.target.value.toUpperCase() }))}
+                                autoComplete="off"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Users can self-enroll using this code. Leave empty to disable self-enrollment.
+                                Changing the code won&apos;t affect already-enrolled users.
+                            </p>
+                        </div>
                         <div className="flex gap-3 pt-1">
                             <Button type="submit" disabled={loading || !form.title.trim()} className="gap-2 flex-1">
                                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}

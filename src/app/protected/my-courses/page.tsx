@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { BookOpen, Clock, ChevronRight, CheckCircle2, CircleDashed, CirclePlay } from 'lucide-react'
 import { notFound } from 'next/navigation'
+import { JoinCourseDialog } from '../components/join-course-dialog'
 
 type AttemptStatus = 'not_started' | 'in_progress' | 'completed'
 
@@ -82,7 +83,10 @@ export default async function MyCoursesPage() {
     return (
         <div className="space-y-6">
             <header>
-                <h1 className="text-2xl font-semibold">My Courses</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-semibold">My Courses</h1>
+                    <JoinCourseDialog />
+                </div>
                 <p className="text-muted-foreground text-sm mt-1">
                     Courses assigned to you. Each course can only be attempted once.
                 </p>
@@ -92,6 +96,7 @@ export default async function MyCoursesPage() {
                 <section className="rounded-lg border border-dashed p-12 text-center">
                     <BookOpen className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                     <p className="text-muted-foreground text-sm">You have no courses assigned yet.</p>
+                    <p className="text-muted-foreground text-xs mt-1">Have an enroll code? Use the Join Course button above.</p>
                 </section>
             ) : (
                 <ul className="grid sm:grid-cols-2 gap-4 list-none p-0 m-0">

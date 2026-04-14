@@ -20,6 +20,7 @@ export default function NewCoursePage() {
         description: '',
         duration_min: '',
         question_limit: '',
+        enroll_code: '',
         is_published: false,
     })
 
@@ -37,6 +38,7 @@ export default function NewCoursePage() {
                 description: form.description || null,
                 duration_min: form.duration_min ? parseInt(form.duration_min) : null,
                 question_limit: form.question_limit ? parseInt(form.question_limit) : null,
+                enroll_code: form.enroll_code.trim() || null,
                 is_published: form.is_published,
                 created_by: user.id,
             })
@@ -96,6 +98,17 @@ export default function NewCoursePage() {
                                         How many questions shown per attempt. Required questions always included.
                                     </p>
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="enroll_code">Enroll Code</Label>
+                                <Input id="enroll_code" placeholder="e.g. SAFETY2026 (optional)"
+                                    value={form.enroll_code}
+                                    onChange={e => setForm(f => ({ ...f, enroll_code: e.target.value.toUpperCase() }))} 
+                                    autoComplete="off" />
+                                <p className="text-xs text-muted-foreground">
+                                    Users can self-enroll using this code. Leave empty to disable.
+                                </p>
                             </div>
 
                             <div className="flex items-center justify-between rounded-lg border p-4">
