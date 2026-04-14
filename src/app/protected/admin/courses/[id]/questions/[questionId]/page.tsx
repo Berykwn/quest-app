@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowLeft, Plus, Trash2, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import QuestionImageUpload from '../../components/question-image-upload'
 
 export default function EditQuestionPage({ params }: { params: Promise<{ id: string; questionId: string }> }) {
     const { id, questionId } = use(params)
@@ -19,9 +20,9 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
     const [loading, setLoading] = useState(false)
     const [fetching, setFetching] = useState(true)
     const [initialized, setInitialized] = useState(false)
-    // const [questionType, setQuestionType] = useState<'multiple_choice' | 'true_false' | 'essay'>('multiple_choice')
     const [questionType, setQuestionType] = useState<'multiple_choice' | 'true_false'>('multiple_choice')
     const [options, setOptions] = useState<{ key: string; text: string }[]>([])
+    const [imageUrl, setImageUrl] = useState<string | null>(null)
     const [form, setForm] = useState({
         question_text: '',
         correct_answer: '',
@@ -33,10 +34,7 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
         async function fetchQuestion() {
             const supabase = createClient()
             const { data, error } = await supabase
-                .from('questions')
-                .select('*')
-                .eq('id', questionId)
-                .single()
+                .from('questions').select('*').eq('id', questionId).single()
 
             if (error || !data) {
                 toast.error('Question not found.')
@@ -52,6 +50,7 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
                 points: data.points.toString(),
             })
             if (data.options) setOptions(data.options)
+            if (data.image_url) setImageUrl(data.image_url)
             setFetching(false)
             setInitialized(true)
         }
@@ -65,34 +64,24 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
                 { key: 'A', text: '' }, { key: 'B', text: '' },
                 { key: 'C', text: '' }, { key: 'D', text: '' },
             ])
-        } else if (questionType === 'true_false') {
-            setOptions([{ key: 'true', text: 'True' }, { key: 'false', text: 'False' }])
         } else {
-            setOptions([])
+            setOptions([{ key: 'true', text: 'True' }, { key: 'false', text: 'False' }])
         }
         setForm(f => ({ ...f, correct_answer: '' }))
     }, [questionType])
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
-
-        // if (questionType !== 'essay' && !form.correct_answer) {
-        //     toast.warning('Please select the correct answer.')
-        //     return
-        // }
         if (questionType === 'multiple_choice' && options.filter(o => o.text.trim()).length < 2) {
             toast.warning('Please fill in at least 2 answer choices.')
             return
         }
-
         setLoading(true)
         const supabase = createClient()
 
         const optionsData = questionType === 'multiple_choice'
             ? options.filter(o => o.text.trim())
-            : questionType === 'true_false'
-                ? [{ key: 'true', text: 'True' }, { key: 'false', text: 'False' }]
-                : null
+            : [{ key: 'true', text: 'True' }, { key: 'false', text: 'False' }]
 
         const { error } = await supabase.from('questions').update({
             question_text: form.question_text,
@@ -101,21 +90,15 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
             correct_answer: form.correct_answer || null,
             explanation: form.explanation || null,
             points: parseInt(form.points) || 1,
+            image_url: imageUrl,
         }).eq('id', questionId)
 
-        if (error) {
-            toast.error('Failed to save changes.', { description: error.message })
-            setLoading(false)
-            return
-        }
-
+        if (error) { toast.error('Failed to save changes.', { description: error.message }); setLoading(false); return }
         toast.success('Question updated successfully.')
         router.push(`/protected/admin/courses/${id}`)
     }
 
-    const isSubmitDisabled = loading
-        || !form.question_text
-        // || (questionType !== 'essay' && !form.correct_answer)
+    const isSubmitDisabled = loading || !form.question_text
         || (questionType === 'multiple_choice' && options.filter(o => o.text.trim()).length < 2)
 
     if (fetching) {
@@ -153,7 +136,6 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
                                         <SelectContent>
                                             <SelectItem value="multiple_choice">Multiple Choice</SelectItem>
                                             <SelectItem value="true_false">True / False</SelectItem>
-                                            {/* <SelectItem value="essay">Essay</SelectItem> */}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -169,6 +151,11 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
                                 <Textarea id="question_text" placeholder="Write your question here..." rows={3} required
                                     value={form.question_text}
                                     onChange={e => setForm(f => ({ ...f, question_text: e.target.value }))} />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Question Image</Label>
+                                <QuestionImageUpload value={imageUrl} onChange={setImageUrl} />
                             </div>
 
                             {questionType === 'multiple_choice' && (
@@ -206,32 +193,25 @@ export default function EditQuestionPage({ params }: { params: Promise<{ id: str
                                 </div>
                             )}
 
-                            {/* {questionType !== 'essay' && ( */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="correct_answer">Correct Answer <span aria-hidden className="text-destructive">*</span></Label>
-                                    <Select value={form.correct_answer}
-                                        onValueChange={v => setForm(f => ({ ...f, correct_answer: v }))}>
-                                        <SelectTrigger id="correct_answer">
-                                            <SelectValue placeholder="Select correct answer..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {questionType === 'true_false'
-                                                ? [{ key: 'true', text: 'True' }, { key: 'false', text: 'False' }].map(o => (
-                                                    <SelectItem key={o.key} value={o.key}>{o.text}</SelectItem>
-                                                ))
-                                                : options.filter(o => o.text.trim()).map(o => (
-                                                    <SelectItem key={o.key} value={o.key}>{o.key}. {o.text}</SelectItem>
-                                                ))
-                                            }
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            {/* )}  */}
+                            <div className="space-y-2">
+                                <Label htmlFor="correct_answer">Correct Answer <span aria-hidden className="text-destructive">*</span></Label>
+                                <Select value={form.correct_answer} onValueChange={v => setForm(f => ({ ...f, correct_answer: v }))}>
+                                    <SelectTrigger id="correct_answer"><SelectValue placeholder="Select correct answer..." /></SelectTrigger>
+                                    <SelectContent>
+                                        {questionType === 'true_false'
+                                            ? [{ key: 'true', text: 'True' }, { key: 'false', text: 'False' }].map(o => (
+                                                <SelectItem key={o.key} value={o.key}>{o.text}</SelectItem>
+                                            ))
+                                            : options.filter(o => o.text.trim()).map(o => (
+                                                <SelectItem key={o.key} value={o.key}>{o.key}. {o.text}</SelectItem>
+                                            ))
+                                        }
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="explanation">
-                                    Explanation <span className="text-muted-foreground text-xs">(optional)</span>
-                                </Label>
+                                <Label htmlFor="explanation">Explanation <span className="text-muted-foreground text-xs">(optional)</span></Label>
                                 <Textarea id="explanation" placeholder="Explanation shown after the exam..." rows={2}
                                     value={form.explanation}
                                     onChange={e => setForm(f => ({ ...f, explanation: e.target.value }))} />

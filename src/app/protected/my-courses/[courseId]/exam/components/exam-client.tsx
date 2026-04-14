@@ -20,6 +20,7 @@ interface Question {
     correct_answer: string | null
     explanation: string | null
     points: number
+    image_url?: string | null
 }
 
 interface Props {
@@ -196,6 +197,9 @@ export default function ExamClient({
                             {question.points} {question.points === 1 ? 'pt' : 'pts'}
                         </Badge>
                     </div>
+                    {question.image_url && (
+                        <img src={question.image_url} alt="Question image" className="rounded-lg border max-h-64 object-contain w-full mt-2" />
+                    )}
                 </CardHeader>
                 <CardContent>
                     {question.question_type === 'multiple_choice' && question.options && (

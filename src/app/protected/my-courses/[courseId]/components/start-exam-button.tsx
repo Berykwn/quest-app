@@ -46,7 +46,7 @@ export default function StartExamButton({ courseId }: { courseId: string }) {
 
         const { data: questions, error: questionsError } = await supabase
             .from('questions')
-            .select('id, question_text, question_type, options, correct_answer, explanation, points, is_required')
+            .select('id, question_text, question_type, options, correct_answer, explanation, points, is_required, image_url')
             .eq('course_id', courseId)
 
         if (questionsError || !questions?.length) {
@@ -64,18 +64,18 @@ export default function StartExamButton({ courseId }: { courseId: string }) {
         const shuffledPool = [...pool]
         for (let i = shuffledPool.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1))
-                ;[shuffledPool[i], shuffledPool[j]] = [shuffledPool[j], shuffledPool[i]]
+            ;[shuffledPool[i], shuffledPool[j]] = [shuffledPool[j], shuffledPool[i]]
         }
 
         const combined = [...required, ...shuffledPool.slice(0, randomNeeded)]
         for (let i = combined.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1))
-                ;[combined[i], combined[j]] = [combined[j], combined[i]]
+            ;[combined[i], combined[j]] = [combined[j], combined[i]]
         }
 
         const questionIds = combined.map(q => q.id)
-        const snapshot = combined.map(({ id, question_text, question_type, options, correct_answer, explanation, points }) => ({
-            id, question_text, question_type, options, correct_answer, explanation, points,
+        const snapshot = combined.map(({ id, question_text, question_type, options, correct_answer, explanation, points, image_url }) => ({
+            id, question_text, question_type, options, correct_answer, explanation, points, image_url,
         }))
 
         const { data: attempt, error: attemptError } = await supabase
