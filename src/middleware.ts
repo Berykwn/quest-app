@@ -21,30 +21,50 @@ export async function middleware(request: NextRequest) {
         }
     )
 
+    // Refresh session — must be called before any redirect logic
     const { data: { user } } = await supabase.auth.getUser()
     const { pathname } = request.nextUrl
 
     const publicRoutes = ['/sign-in', '/sign-up', '/forgot-password', '/update-password', '/confirm', '/error']
-    const isPublicRoute = publicRoutes.includes(pathname)
+    const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
     const isAdminRoute = pathname.startsWith('/protected/admin')
+    const isUserRoute = pathname.startsWith('/protected') && !isAdminRoute
 
+    // Unauthenticated user trying to access protected route
     if (!user && !isPublicRoute) {
         return NextResponse.redirect(new URL('/sign-in', request.url))
     }
 
+    // Authenticated user trying to access public route — redirect based on role
     if (user && isPublicRoute) {
-        return NextResponse.redirect(new URL('/protected', request.url))
-    }
-
-    if (user && isAdminRoute) {
         const { data: profile } = await supabase
             .from('users')
             .select('role')
             .eq('id', user.id)
             .single()
 
-        if (!profile || profile.role !== 'admin') {
+        const destination = profile?.role === 'admin' ? '/protected/admin' : '/protected'
+        return NextResponse.redirect(new URL(destination, request.url))
+    }
+
+    // Role-based access control for protected routes
+    if (user && (isAdminRoute || isUserRoute)) {
+        const { data: profile } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', user.id)
+            .single()
+
+        const isAdmin = profile?.role === 'admin'
+
+        // Non-admin trying to access admin route
+        if (isAdminRoute && !isAdmin) {
             return NextResponse.redirect(new URL('/protected', request.url))
+        }
+
+        // Admin trying to access user route
+        if (isUserRoute && isAdmin) {
+            return NextResponse.redirect(new URL('/protected/admin', request.url))
         }
     }
 
