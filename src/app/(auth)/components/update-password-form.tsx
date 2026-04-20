@@ -46,10 +46,22 @@ export function UpdatePasswordForm({
         <div className={cn('flex flex-col gap-6', className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-                    <CardDescription>
-                        Please enter your new password below.
-                    </CardDescription>
+                    <div className="flex items-center gap-3">
+                        <img
+                            src="/logo-pe.png"
+                            alt="PT. Priamanaya Energy Logo"
+                            className="h-10 w-10 object-contain"
+                        />
+                        <div className="flex flex-col leading-tight">
+                            <span className="text-base font-semibold tracking-tight">questions.</span>
+                            <span className="text-xs text-muted-foreground">by Priamanaya Energi</span>
+                        </div>
+                    </div>
+
+                    <div className='mt-4'>
+                        <h1 className='font-medium'>Reset Your Password</h1>
+                        <p className='text-sm text-muted-foreground'>Please enter your new password below.</p>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleForgotPassword}>

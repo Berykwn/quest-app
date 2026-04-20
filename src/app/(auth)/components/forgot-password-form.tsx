@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useState } from 'react'
+import { InfoIcon } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 export function ForgotPasswordForm({
     className,
@@ -49,24 +51,54 @@ export function ForgotPasswordForm({
             {success ? (
                 <Card className='p-2'>
                     <CardHeader>
-                        <CardTitle className="text-2xl">Check Your Email</CardTitle>
-                        <CardDescription>Password reset instructions sent</CardDescription>
+                        <div className="flex items-center gap-3">
+                            <img
+                                src="/logo-pe.png"
+                                alt="PT. Priamanaya Energy Logo"
+                                className="h-10 w-10 object-contain"
+                            />
+                            <div className="flex flex-col leading-tight">
+                                <span className="text-base font-semibold tracking-tight">questions.</span>
+                                <span className="text-xs text-muted-foreground">by Priamanaya Energi</span>
+                            </div>
+                        </div>
+
+                        <div className='mt-4'>
+                            <h1 className='font-medium'>Check Your Email</h1>
+                            <p className='text-sm text-muted-foreground'>Password reset instructions sent</p>
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground text-sm">
-                            If you registered using your email and password, you will receive
-                            a password reset email.
-                        </p>
+                        <Alert className="max-w-md border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
+                            <InfoIcon />
+                            <AlertDescription>
+                                If you registered using your email and password, you will receive
+                                a password reset email.
+                            </AlertDescription>
+                        </Alert>
                     </CardContent>
+
                 </Card>
             ) : (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-                        <CardDescription>
-                            Type in your email and we&apos;ll send you a link to reset your
-                            password
-                        </CardDescription>
+                        <div className="flex items-center gap-3">
+                            <img
+                                src="/logo-pe.png"
+                                alt="PT. Priamanaya Energy Logo"
+                                className="h-10 w-10 object-contain"
+                            />
+                            <div className="flex flex-col leading-tight">
+                                <span className="text-base font-semibold tracking-tight">questions.</span>
+                                <span className="text-xs text-muted-foreground">by Priamanaya Energi</span>
+                            </div>
+                        </div>
+
+                        <div className='mt-4'>
+                            <h1 className='font-medium'>Reset Your Password</h1>
+                            <p className='text-sm text-muted-foreground'>Type in your email and we&apos;ll send you a link to reset your
+                                password</p>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleForgotPassword}>
@@ -87,7 +119,7 @@ export function ForgotPasswordForm({
                                     {isLoading ? 'Sending...' : 'Send reset email'}
                                 </Button>
                             </div>
-                            <div className="mt-4 text-center text-sm border-t pt-4">
+                            <div className="mt-4 text-center text-sm">
                                 Already have an account?{' '}
                                 <Link
                                     href="/sign-in"

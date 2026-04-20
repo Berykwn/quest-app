@@ -49,7 +49,7 @@ export function AppSidebar({ user }: { user: User }) {
     async function handleLogout() {
         const supabase = createClient()
         await supabase.auth.signOut()
-        router.push('/auth/login')
+        router.push('/sign-in')
         router.refresh()
     }
 
@@ -69,7 +69,7 @@ export function AppSidebar({ user }: { user: User }) {
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none mt-0.5">
                                     <span className="font-semibold">questions.</span>
-                                    <span className="text-xs text-muted-foreground">by Priamanaya Energy</span>
+                                    <span className="text-xs text-muted-foreground">by Priamanaya Energi</span>
                                 </div>
                             </Link>
                         </SidebarMenuButton>
