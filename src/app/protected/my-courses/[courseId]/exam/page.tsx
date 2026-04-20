@@ -7,7 +7,7 @@ export default async function ExamPage({ params }: { params: Promise<{ courseId:
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) redirect('/login')
+    if (!user) redirect('/sign-in')
 
     const { data: attempt } = await supabase
         .from('attempts')

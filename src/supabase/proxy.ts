@@ -47,15 +47,24 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
 
+  const { pathname } = request.nextUrl
+
+  // Define public routes (since we no longer use /auth prefix)
+  const publicRoutes = ['/', '/sign-in', '/sign-up', '/forgot-password', '/update-password', '/confirm', '/error']
+
+  // Check if current route is public
+  const isPublicRoute = publicRoutes.some((route) =>
+    pathname.startsWith(route)
+  )
+
   if (
-    request.nextUrl.pathname !== '/' &&
+    pathname !== '/' &&
     !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
+    !isPublicRoute
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
+    url.pathname = '/sign-in'
     return NextResponse.redirect(url)
   }
 

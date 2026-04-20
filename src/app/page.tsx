@@ -5,7 +5,7 @@ export default async function Home() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) redirect('/auth/login')
+  if (!user) redirect('/sign-in')
 
   const { data: profile } = await supabase
     .from('users')

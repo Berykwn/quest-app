@@ -4,7 +4,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     return (
         <>
             <div className="min-h-screen flex flex-col">
-                {/* Navbar */}
                 <nav className="fixed-top flex items-center justify-between px-6 py-3.5">
                     <div className="flex items-center gap-x-3">
                         <img

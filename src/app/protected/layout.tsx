@@ -8,7 +8,7 @@ import { DynamicBreadcrumb } from './components/dynamic-breadcrumb'
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user: authUser } } = await supabase.auth.getUser()
-  if (!authUser) redirect('/auth/login')
+  if (!authUser) redirect('/sign-in')
 
   const { data: profile } = await supabase
     .from('users')
@@ -16,7 +16,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
     .eq('id', authUser.id)
     .single()
 
-  if (!profile) redirect('/auth/login')
+  if (!profile) redirect('/sign-in')
 
   return (
     <SidebarProvider>
