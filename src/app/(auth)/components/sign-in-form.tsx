@@ -3,14 +3,13 @@
 import { cn } from '@/utils/tailwind'
 import { createClient } from '@/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Separator } from '@/components/ui/separator'
 
 export function SignInForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
     const [email, setEmail] = useState('')
@@ -28,7 +27,7 @@ export function SignInForm({ className, ...props }: React.ComponentPropsWithoutR
             if (error) throw error
 
             toast.success('Signed in successfully')
-            router.push('/protected')
+            router.push('/')
         } catch (err: unknown) {
             const message = err instanceof Error
                 ? err.message === 'Invalid login credentials'
